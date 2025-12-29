@@ -1,36 +1,18 @@
-from flask import Blueprint, jsonify, request
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from flask import Blueprint, jsonify, make_response
+from app.models.driver_model import get_drivers_by_year
 
 bp = Blueprint('drivers', __name__, url_prefix='/driver')
 
-@bp.get('/')
-def driverHome():
-    return jsonify({'test': "tester"})
-
-
-def get_drivers_by_year(conn, year: int):
-
-    query = """
-        SELECT DISTINCT
-            d.id,
-            d.driver_number,
-            d.first_name,
-            d.last_name,
-            d.full_name,
-            d.broadcast_name,
-            d.name_acronym,
-            d.team_name,
-            d.team_colour,
-            d.country_code,
-            d.headshot_url
-        FROM drivers d
-        JOIN sessions s
-            ON d.session_key = s.session_key
-        WHERE s.year = %s
-        ORDER BY d.driver_number;
-    """
-
-    with conn.cursor(cursor_factory=RealDictCursor) as cursor:
-        cursor.execute(query, (year,))
-        return cursor.fetchall()
+@bp.get('/<int:year>')
+def drivers_by_year(year):
+    result, msg = get_drivers_by_year(year)
+    
+    if result is None:
+        response = make_response(jsonify({'error': msg}), 500)
+        return response
+    elif len(result) == 0:
+        response = make_response(jsonify({'error': "Data not available"}), 404)
+        return response
+    
+    response = make_response(jsonify(result), 200)
+    return response
