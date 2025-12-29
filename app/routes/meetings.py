@@ -1,6 +1,6 @@
-from flask import Blueprint, jsonify, make_response, request
+from flask import Blueprint, request
 from app.models.meetings_model import get_meetings_by_year
-from app.models.sessions_model import get_sessions_for_meeting
+from app.utils.response_helper import create_response
 
 bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 
@@ -8,28 +8,4 @@ bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 def meetings_by_year():
     year = request.args.get('year')
     result, msg = get_meetings_by_year(year)
-    
-    if result is None:
-        response = make_response(jsonify({'error': msg}), 500)
-        return response
-    elif len(result) == 0:
-        response = make_response(jsonify({'error': "Data not available"}), 404)
-        return response
-    
-    response = make_response(jsonify(result), 200)
-    return response
-
-@bp.get('/sessions')
-def all_sessions_for_meeting():
-    meeting_key = request.args.get('meeting_key')
-    result, msg = get_sessions_for_meeting(meeting_key)
-    
-    if result is None:
-        response = make_response(jsonify({'error': msg}), 500)
-        return response
-    elif len(result) == 0:
-        response = make_response(jsonify({'error': "Data not available"}), 404)
-        return response
-    
-    response = make_response(jsonify(result), 200)
-    return response
+    return create_response(result, msg)
