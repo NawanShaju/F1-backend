@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response
 from app.models.driver_model import get_drivers_by_year
 
-bp = Blueprint('drivers', __name__, url_prefix='/driver')
+bp = Blueprint('drivers', __name__, url_prefix='/drivers')
 
 @bp.get('/<int:year>')
 def drivers_by_year(year):
