@@ -1,11 +1,12 @@
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, request
 from app.models.meetings_model import get_meetings_by_year
 from app.models.sessions_model import get_sessions_for_meeting
 
 bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 
-@bp.get('/<int:year>')
-def meetings_by_year(year):
+@bp.get('/')
+def meetings_by_year():
+    year = request.args.get('year')
     result, msg = get_meetings_by_year(year)
     
     if result is None:
@@ -18,8 +19,9 @@ def meetings_by_year(year):
     response = make_response(jsonify(result), 200)
     return response
 
-@bp.get('/sessions/<int:meeting_key>')
-def all_sessions_for_meeting(meeting_key):
+@bp.get('/sessions')
+def all_sessions_for_meeting():
+    meeting_key = request.args.get('meeting_key')
     result, msg = get_sessions_for_meeting(meeting_key)
     
     if result is None:

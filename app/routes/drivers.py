@@ -1,10 +1,11 @@
-from flask import Blueprint, jsonify, make_response
+from flask import Blueprint, jsonify, make_response, request
 from app.models.driver_model import get_drivers_by_year
 
 bp = Blueprint('drivers', __name__, url_prefix='/drivers')
 
-@bp.get('/<int:year>')
-def drivers_by_year(year):
+@bp.get('/')
+def drivers_by_year():
+    year = request.args.get('year')
     result, msg = get_drivers_by_year(year)
     
     if result is None:
