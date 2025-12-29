@@ -22,5 +22,5 @@ def get_meetings_by_year(year: int = 2025):
             """
             return read_sql_query(query, manager.conn, params=(year,)).to_dict(orient='records'), "Data successfully retrived"
     except Exception as e:
-        logger.error(f"Error fetching driver by year {year}: {e}")
+        logger.error(f"Error fetching meetings by year {year}: {e}")
         return None, e

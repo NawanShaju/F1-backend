@@ -23,5 +23,5 @@ def get_sessions_for_meeting(meetings: int):
             """
             return read_sql_query(query, manager.conn, params=(meetings,)).to_dict(orient='records'), "Data successfully retrived"
     except Exception as e:
-        logger.error(f"Error fetching driver by year {meetings}: {e}")
+        logger.error(f"Error fetching sessions for meeting {meetings}: {e}")
         return None, e

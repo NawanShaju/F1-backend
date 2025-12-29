@@ -214,15 +214,15 @@ CREATE TABLE session_result (
     meeting_key INTEGER NOT NULL REFERENCES meetings(meeting_key),
     driver_number INTEGER NOT NULL,
     position INTEGER,
+    points NUMERIC(4, 1),
     dnf BOOLEAN DEFAULT FALSE,
     dns BOOLEAN DEFAULT FALSE,
     dsq BOOLEAN DEFAULT FALSE,
     duration NUMERIC(10, 3)[],
-    gap_to_leader TEXT[],
+    gap_to_leader TEXT,
     number_of_laps INTEGER,
     UNIQUE(session_key, driver_number)
 );
-
 CREATE TABLE starting_grid (
     id SERIAL PRIMARY KEY,
     session_key INTEGER NOT NULL REFERENCES sessions(session_key),

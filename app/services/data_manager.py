@@ -278,6 +278,7 @@ class F1DataManager:
         except Exception as e:
             self.conn.rollback()
             logger.error(f"Failed to insert into {table}: {e}")
+            raise
         finally:
             cursor.close()
     
@@ -384,21 +385,71 @@ class F1DataManager:
         finally:
             cursor.close()
 
-    def load_session_result(self):
+    def load_missing_session_results(self):
+        """Load session results only for sessions that don't have data yet"""
+        logger.info("Checking for missing session results...")
+        
         cursor = self.conn.cursor()
         try:
-            sessions = self.fetch_from_api('sessions')
+            # Find sessions without session_result data
+            query = """
+                SELECT s.session_key 
+                FROM sessions s
+                LEFT JOIN session_result sr ON s.session_key = sr.session_key
+                WHERE sr.session_key IS NULL
+                ORDER BY s.date_start DESC;
+            """
+            cursor.execute(query)
+            missing_sessions = [row[0] for row in cursor.fetchall()]
             
-            for session in sessions:
-                session_key = session['session_key']
-
-                datas = self.fetch_from_api('session_result', {'session_key': session_key})  
-                for data in datas:
-                    data['gap_to_leader'] = str(data['gap_to_leader'])
-                    if type(data['duration']) == float:
-                        data['duration'] = [data['duration']]
-                              
-                self.insert_generic('session_result', datas)
+            logger.info(f"Found {len(missing_sessions)} sessions with missing results")
+            
+            if not missing_sessions:
+                logger.info("All sessions have results loaded")
+                return
+            
+            total_inserted = 0
+            failed_sessions = []
+            
+            for session_key in missing_sessions:
+                try:
+                    # Fetch data for this session
+                    datas = self.fetch_from_api('session_result', {'session_key': session_key})
+                    
+                    if not datas:
+                        logger.warning(f"No data available from API for session {session_key}")
+                        continue
+                    
+                    # Process each record
+                    processed_data = []
+                    for data in datas:
+                        processed = data.copy()
+                        
+                        # Handle gap_to_leader
+                        if processed.get('gap_to_leader') is not None:
+                            processed['gap_to_leader'] = str(processed['gap_to_leader'])
+                        
+                        # Handle duration
+                        if isinstance(processed.get('duration'), float):
+                            processed['duration'] = [processed['duration']]
+                        
+                        processed_data.append(processed)
+                    
+                    # Insert all records for this session
+                    self.insert_generic('session_result', processed_data)
+                    total_inserted += len(processed_data)
+                    logger.info(f"Loaded {len(processed_data)} results for session {session_key}")
+                    
+                except Exception as e:
+                    logger.error(f"Failed to load session {session_key}: {e}")
+                    failed_sessions.append(session_key)
+                    continue
+            
+            logger.info(f"Missing session results loaded. Total: {total_inserted}")
+            
+            if failed_sessions:
+                logger.warning(f"Failed to load: {failed_sessions}")
+            
         finally:
             cursor.close()
             
@@ -473,7 +524,7 @@ class F1DataManager:
 #     with F1DataManager(db_config) as manager:
 #         # manager.initial_setup(year=2023)
 #         # manager.load_driver_info_by_year(2022)
-#         manager.load_session_result()
+#         manager.load_missing_session_results()
         
 #         # # Example: Get lap data (will use cache if available)
 #         # laps = manager.get_data('laps', session_key=9161, filters={'driver_number': 1})
