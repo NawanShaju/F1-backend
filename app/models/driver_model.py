@@ -61,3 +61,32 @@ def get_driver_race_wins_in_year(driver_number: int, year: int = 2025):
     except Exception as e:
         logger.error(f"Error fetching driver wins by year {year}: {e}")
         return None, e
+
+def get_driver_podiums_in_year(driver_number: int, year: int = 2025):
+    try:
+        with F1DataManager(Config.DB_CONFIG) as manager:
+            query = """
+                SELECT 
+                    s.circuit_short_name,
+                    s.location,
+                    d.driver_number,
+                    d.full_name,
+                    d.team_name,
+                    s.date_start as win_dates
+                FROM session_result sr
+                JOIN drivers d
+                    ON d.driver_number = sr.driver_number
+                    AND d.session_key = sr.session_key
+                JOIN sessions s
+                    ON sr.session_key = s.session_key
+                WHERE d.driver_number = %s
+                    AND s.year = %s
+                    AND sr.position <= 3
+                    AND s.session_name = 'Race'
+                ORDER BY win_dates, s.circuit_short_name;
+            """
+                    
+            return read_sql_query(query, manager.conn, params=(driver_number, year)).to_dict(orient='records'), "Data successfully retrived"
+    except Exception as e:
+        logger.error(f"Error fetching driver wins by year {year}: {e}")
+        return None, e
