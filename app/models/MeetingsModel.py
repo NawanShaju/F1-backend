@@ -9,15 +9,6 @@ class MeetingsModel(Query):
         super().__init__()
     
     def get_meetings_by_year(self, year: int = 2025) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
-        """
-        Get all meetings for a specific year
-        
-        Args:
-            year: The year to filter meetings
-            
-        Returns:
-            Tuple of (results, error_message)
-        """
         query = """
             SELECT DISTINCT ON (m.date_start)
                 m.meeting_key,
@@ -34,7 +25,6 @@ class MeetingsModel(Query):
         return self.query_db(query, (year,))
     
     def get_meeting_by_key(self, meeting_key: int) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
-        """Get specific meeting by key"""
         query = """
             SELECT 
             m.circuit_short_name,
