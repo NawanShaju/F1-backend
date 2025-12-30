@@ -1,7 +1,4 @@
 from app.models.Query import Query
-from pandas import read_sql_query
-from app.config import Config
-from app.services.data_manager import F1DataManager
 
 class DriverModel(Query):
     def __init__(self):
