@@ -1,6 +1,5 @@
 from app.models.Query import Query
 
-
 class MeetingsModel(Query):
     """Model for meetings-related database operations"""
     

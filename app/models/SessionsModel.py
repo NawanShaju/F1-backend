@@ -1,7 +1,6 @@
 from app.models.Query import Query
 
 class SessionsModel(Query):
-    
     def __init__(self):
         super().__init__()
 

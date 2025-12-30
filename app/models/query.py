@@ -4,7 +4,6 @@ from app.config import Config
 from psycopg2 import connect
 from typing import Optional, Tuple, List, Dict, Any
 
-
 class Query:
     """Base class for database queries with connection management"""
     
@@ -13,24 +12,20 @@ class Query:
         self.logger = logging.getLogger(__name__)
     
     def connect(self):
-        """Establish database connection"""
         if not self.conn or self.conn.closed:
             self.conn = connect(**Config.DB_CONFIG)
             self.logger.info("Database connection established")
     
     def close(self):
-        """Close database connection"""
         if self.conn and not self.conn.closed:
             self.conn.close()
             self.logger.info("Database connection closed")
     
     def __enter__(self):
-        """Context manager entry"""
         self.connect()
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        """Context manager exit"""
         self.close()
         return False
     
