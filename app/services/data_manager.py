@@ -1,8 +1,7 @@
 import psycopg2
 from psycopg2.extras import execute_batch
 import requests
-from datetime import datetime, timedelta
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Optional
 import time
 import logging
 from dataclasses import dataclass
