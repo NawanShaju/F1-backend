@@ -1,5 +1,4 @@
 from app.models.Query import Query
-from typing import Optional, Tuple, List, Dict, Any
 
 
 class MeetingsModel(Query):
