@@ -8,7 +8,7 @@ class MeetingsModel(Query):
     def __init__(self):
         super().__init__()
     
-    def get_meetings_by_year(self, year: int = 2025) -> Tuple[Optional[List[Dict[str, Any]]], Optional[str]]:
+    def get_meetings_by_year(self, year: int = 2025):
         query = """
             SELECT DISTINCT ON (m.date_start)
                 m.meeting_key,
@@ -24,7 +24,7 @@ class MeetingsModel(Query):
         
         return self.query_db(query, (year,))
     
-    def get_meeting_by_key(self, meeting_key: int) -> Tuple[Optional[Dict[str, Any]], Optional[str]]:
+    def get_meeting_by_key(self, meeting_key: int):
         query = """
             SELECT 
             m.circuit_short_name,
