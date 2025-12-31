@@ -8,5 +8,6 @@ sessons_model = SessionsModel()
 @bp.get('/')
 def all_sessions():
     meeting_key = request.args.get('meeting_key')
-    result, msg = sessons_model.get_sessions_for_meeting(meeting_key)
+    df, msg = sessons_model.get_sessions_for_meeting(meeting_key)
+    result = df.to_dict(orient='records')
     return create_response(result, msg)

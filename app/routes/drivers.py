@@ -10,7 +10,8 @@ validatior = Validator()
 @bp.get('/')
 def drivers_by_year():
     year = request.args.get('year')
-    result, msg = driver_model.get_drivers_by_year(year)
+    df, msg = driver_model.get_drivers_by_year(year)
+    result = df.to_dict(orient='records')
     return create_response(result, msg)
 
 @bp.get('/race-wins')
@@ -21,7 +22,8 @@ def driver_race_win_by_year():
     if not validatior.driver_exists_in_year(driver_number, year):
         return make_response(jsonify({'error': f'Driver with number {driver_number} does not exist in the year {year}'}), 404)
     
-    result, msg = driver_model.get_driver_race_wins_in_year(driver_number, year)
+    df, msg = driver_model.get_driver_race_wins_in_year(driver_number, year)
+    result = df.to_dict(orient='records')
     
     if len(result) == 0:
         return make_response(jsonify({'info': f'Driver did not win in the year {year}'}), 200)
@@ -36,7 +38,8 @@ def driver_podiums_by_year():
     if not validatior.driver_exists_in_year(driver_number, year):
         return make_response(jsonify({'error': f'Driver with number {driver_number} does not exist in the year {year}'}), 404)
     
-    result, msg = driver_model.get_driver_podiums_in_year(driver_number, year)
+    df, msg = driver_model.get_driver_podiums_in_year(driver_number, year)
+    result = df.to_dict(orient='records')
     
     if len(result) == 0:
         return make_response(jsonify({'info': f'Driver did not get podiums in the year {year}'}), 200)

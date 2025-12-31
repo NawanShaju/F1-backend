@@ -24,8 +24,7 @@ class Query:
         """
         try:            
             df = read_sql_query(query, self.conn_string, params=params)
-            result = df.to_dict(orient='records')
-            return result, None
+            return df, None
             
         except Exception as e:
             self.logger.error(f"Error fetching data from database: {e}")
