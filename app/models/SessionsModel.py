@@ -20,3 +20,19 @@ class SessionsModel(Query):
         """
         
         return self.query_db(query, (meeting_key,))
+    
+    def get_session_by_key(self, session_key: int):
+        query = """
+            SELECT 
+            s.session_name,
+            s.session_type,
+            s.session_key,
+            s.circuit_short_name,
+            s.date_start,
+            s.date_end,
+            s.location,
+            FROM sessions s
+            WHERE session_key = %s;
+        """
+        
+        return self.query_db(query, (session_key,))

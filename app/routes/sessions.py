@@ -11,3 +11,10 @@ def all_sessions():
     df, msg = sessons_model.get_sessions_for_meeting(meeting_key)
     result = df.to_dict(orient='records')
     return create_response(result, msg)
+
+@bp.get('/get-session')
+def meeting_by_key():
+    session_key = request.args.get('session_key')
+    df, msg = sessons_model.get_session_by_key(session_key)
+    result = df.to_dict(orient='records')
+    return create_response(result, msg)
