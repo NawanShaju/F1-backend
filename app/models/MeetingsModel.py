@@ -37,11 +37,4 @@ class MeetingsModel(Query):
             WHERE meeting_key = %s;
         """
         
-        result, error = self.query_db(query, (meeting_key,))
-        
-        print(result)
-        
-        if result and len(result) > 0:
-            return result[0], None
-        
-        return None, error or "Meeting not found"
+        return self.query_db(query, (meeting_key,))

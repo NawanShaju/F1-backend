@@ -10,13 +10,16 @@ class SessionResultModel(Query):
         sr.position,
         sr.number_of_laps,
         sr.gap_to_leader,
+        sr.duration,
         sr.driver_number,
         d.full_name,
         d.team_name,
+        d.team_colour,
         sr.dnf,
         sr.dns,
         sr.dsq,
-        sr.points
+        sr.points,
+        d.headshot_url
         FROM session_result sr
         JOIN drivers d
                 ON d.driver_number = sr.driver_number
