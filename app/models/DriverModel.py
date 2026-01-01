@@ -26,6 +26,25 @@ class DriverModel(Query):
         """
         
         return self.query_db(query, (year,))
+    
+    def get_driver_info(self, driver_number, session_key):
+        query = """
+            SELECT DISTINCT ON (d.driver_number)
+                d.driver_number,
+                d.first_name,
+                d.last_name,
+                d.full_name,
+                d.broadcast_name,
+                d.name_acronym,
+                d.team_name,
+                d.team_colour,
+                d.country_code,
+                d.headshot_url
+            FROM drivers d
+            WHERE d.driver_number = %s AND d.session_key = %s
+        """
+        
+        return self.query_db(query, (driver_number, session_key))
         
     def get_driver_race_wins_in_year(self, driver_number: int, year: int = 2025):
         query = """

@@ -30,7 +30,7 @@ class SessionsModel(Query):
             s.circuit_short_name,
             s.date_start,
             s.date_end,
-            s.location,
+            s.location
             FROM sessions s
             WHERE session_key = %s;
         """
