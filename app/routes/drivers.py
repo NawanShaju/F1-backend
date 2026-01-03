@@ -31,6 +31,18 @@ def driver_by_number_and_session():
     result = df.to_dict(orient='records')
     return create_response(result, msg)
 
+@bp.get('/driver-for-year')
+def driver_by_number_and_year():
+    year = request.args.get('year')    
+    driver_number = request.args.get('driver_number')
+    
+    if not validatior.driver_exists_in_year(driver_number, year):
+        return make_response(jsonify({'error': f'Driver with number {driver_number} does not exist in the year {year}'}), 404)
+    
+    df, msg = driver_model.get_driver_info_by_year(driver_number, year)
+    result = df.to_dict(orient='records')
+    return create_response(result, msg)
+
 @bp.get('/race-wins')
 def driver_race_win_by_year():
     driver_number = request.args.get('driver_number')
