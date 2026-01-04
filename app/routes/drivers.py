@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, make_response, request
 from app.models.DriverModel import DriverModel
 from app.utils.response_helper import create_response
 from app.utils.DbValidator import DbValidator
+from app.services.driver_scraper import scrap_driver_stats
 
 bp = Blueprint('drivers', __name__, url_prefix='/drivers')
 driver_model = DriverModel()
@@ -74,3 +75,21 @@ def driver_podiums_by_year():
         return make_response(jsonify({'info': f'Driver did not get podiums in the year {year}'}), 200)
     
     return create_response(result, msg)
+
+@bp.get('/driver-stats')
+def driver_stats():
+    driver_number = request.args.get('driver_number')
+    year = request.args.get('year')
+    
+    if not validatior.driver_exists_in_year(driver_number, year):
+        return make_response(jsonify({'error': f'Driver with number {driver_number} does not exist in the year {year}'}), 404)
+    
+    df, msg = driver_model.get_driver_info_by_year(driver_number, year)
+
+    full_name = df.loc[0, 'full_name']
+    first_name, last_name = full_name.split(' ', 1)
+    
+    result = scrap_driver_stats(first_name, last_name)
+    
+    return create_response(result, None)
+    
