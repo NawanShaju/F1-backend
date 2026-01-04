@@ -76,7 +76,8 @@ class DriverModel(Query):
                 d.driver_number,
                 d.full_name,
                 d.team_name,
-                s.date_start
+                s.date_start,
+                s.session_name
             FROM session_result sr
             JOIN drivers d
                 ON d.driver_number = sr.driver_number
@@ -86,7 +87,7 @@ class DriverModel(Query):
             WHERE d.driver_number = %s
                 AND s.year = %s
                 AND sr.position = 1
-                AND s.session_name = 'Race'
+                AND s.session_type = 'Race'
             ORDER BY s.date_start, s.circuit_short_name;
         """
         return self.query_db(query, (driver_number, year))     
@@ -101,7 +102,8 @@ class DriverModel(Query):
                 d.full_name,
                 d.team_name,
                 sr.position,
-                s.date_start
+                s.date_start,
+                s.session_name
             FROM session_result sr
             JOIN drivers d
                 ON d.driver_number = sr.driver_number
@@ -111,7 +113,7 @@ class DriverModel(Query):
             WHERE d.driver_number = %s
                 AND s.year = %s
                 AND sr.position <= 3
-                AND s.session_name = 'Race'
+                AND s.session_type = 'Race'
             ORDER BY s.date_start, s.circuit_short_name;
         """
         return self.query_db(query, (driver_number, year))
