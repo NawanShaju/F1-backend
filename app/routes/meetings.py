@@ -1,6 +1,7 @@
 from flask import Blueprint, request
 from app.models.MeetingsModel import MeetingsModel
 from app.utils.response_helper import create_response
+from app.services.circuit_scraper import scrap_circuit_info
 
 bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 meetings_mode = MeetingsModel()
@@ -14,7 +15,28 @@ def meetings_by_year():
 
 @bp.get('/get-meeting')
 def meeting_by_key():
-    meeting_key = request.args.get('meeting_key', default=2025, type=int)
+    meeting_key = request.args.get('meeting_key', type=int)
     df, msg = meetings_mode.get_meeting_by_key(meeting_key)
     result = df.to_dict(orient='records')
     return create_response(result, msg)
+
+@bp.get('/get-meeting-info')
+def meeting_info():
+    meeting_key = request.args.get('meeting_key', type=int)
+    df, msg = meetings_mode.get_meeting_by_key(meeting_key)
+    
+    if msg:
+        return create_response(None, msg)
+    
+    country_name = df.iloc[0]["country_name"]
+    year = df.iloc[0]["year"]
+    
+    if country_name is None or year is None:
+        return create_response(None, "The session or the year does not exists")
+    
+    result = scrap_circuit_info(str(year), str(country_name))
+    
+    if not isinstance(result, dict):
+        return create_response(None, f"The information for the circuit in {country_name} for the year {year} is not available")
+    
+    return create_response(result, None)

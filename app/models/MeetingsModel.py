@@ -14,7 +14,8 @@ class MeetingsModel(Query):
                 m.country_name,
                 m.date_start,
                 m.location,
-                m.meeting_name
+                m.meeting_name,
+                m.circuit_short_name
             FROM meetings m
             WHERE m.year = %s
             ORDER BY m.date_start;
