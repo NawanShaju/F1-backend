@@ -1,10 +1,12 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify, make_response
 from app.models.MeetingsModel import MeetingsModel
 from app.utils.response_helper import create_response
 from app.services.circuit_scraper import scrap_circuit_info
+from app.utils.DbValidator import DbValidator
 
 bp = Blueprint('meetings', __name__, url_prefix='/meetings')
 meetings_mode = MeetingsModel()
+validator = DbValidator()
 
 @bp.get('/')
 def meetings_by_year():
@@ -16,6 +18,10 @@ def meetings_by_year():
 @bp.get('/get-meeting')
 def meeting_by_key():
     meeting_key = request.args.get('meeting_key', type=int)
+    
+    if not validator.meeting_exists(meeting_key):
+        return make_response(jsonify({'error': f'The meeting with key {meeting_key} does not exists'}), 404)
+    
     df, msg = meetings_mode.get_meeting_by_key(meeting_key)
     result = df.to_dict(orient='records')
     return create_response(result, msg)
@@ -23,11 +29,12 @@ def meeting_by_key():
 @bp.get('/get-meeting-info')
 def meeting_info():
     meeting_key = request.args.get('meeting_key', type=int)
+    
+    if not validator.meeting_exists(meeting_key):
+        return make_response(jsonify({'error': f'The meeting with key {meeting_key} does not exists'}), 404)
+    
     df, msg = meetings_mode.get_meeting_by_key(meeting_key)
-    
-    if msg:
-        return create_response(None, msg)
-    
+        
     country_name = df.iloc[0]["country_name"]
     year = df.iloc[0]["year"]
     

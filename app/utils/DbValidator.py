@@ -45,3 +45,13 @@ class DbValidator(Query):
         
         result, msg = self.query_db(query, (session,))
         return self.exists_check(result, msg)
+    
+    def meeting_exists(self, meeting: int) -> bool:
+        query = """
+        SELECT meeting_key
+        FROM meetings
+        WHERE meeting_key = %s
+        """
+        
+        result, msg = self.query_db(query, (meeting,))
+        return self.exists_check(result, msg)
