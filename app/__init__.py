@@ -12,4 +12,8 @@ def create_app(config_class=Config):
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
         
+    @app.route('/health')
+    def health():
+        return {'status': 'healthy', 'message': 'F1 API is running'}, 200
+        
     return app
